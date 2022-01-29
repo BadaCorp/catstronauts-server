@@ -3,20 +3,24 @@ import TrackAPI from "./datasources/track-api";
 import resolvers from "./resolver";
 import { typeDefs } from "./schema";
 
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  dataSources: () => {
-    return {
-      trackAPI: new TrackAPI(),
-    };
-  },
-});
+async function startApolloServer(typeDefs: any, resolvers: any) {
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    dataSources: () => {
+      return {
+        trackAPI: new TrackAPI(),
+      };
+    },
+  });
 
-server.listen().then(() => {
+  const { url, port } = await server.listen({ port: process.env.PORT || 4000 });
+
   console.log(`
-        🚀  Server is running!
-        🔉  Listening on port 4000
-        📭  Query at https://studio.apollographql.com/dev
+      🚀  Server is running
+      🔉  Listening on port ${port}
+      📭  Query at ${url}
     `);
-});
+}
+
+startApolloServer(typeDefs, resolvers);
