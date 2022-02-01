@@ -1,4 +1,18 @@
-import { Author, Root, Track } from "./types/types";
+import { Author, Module, Root, Track } from "./types/types";
+
+interface TrackSchema
+  extends Omit<Track, "modules" | "authorId" | "topic" | "createAt"> {
+  author: Author;
+  modules: Module[];
+}
+
+interface AuthorSchema extends Author {}
+
+interface ModuleSchema
+  extends Omit<
+    Module,
+    "trackId" | "authorId" | "topic" | "content" | "videoUrl"
+  > {}
 
 const resolvers = {
   Query: {
@@ -8,7 +22,7 @@ const resolvers = {
       _: Root,
       __: Root,
       { dataSources }: any
-    ): Promise<Track[]> => {
+    ): Promise<TrackSchema[]> => {
       return dataSources.trackAPI.getTracksForHome();
     },
     // get a single track by id, for the Track page
@@ -16,7 +30,7 @@ const resolvers = {
       _: Root,
       { id }: Track,
       { dataSources }: any
-    ): Promise<Track> => {
+    ): Promise<TrackSchema> => {
       return dataSources.trackAPI.getTrack(id);
     },
   },
@@ -25,8 +39,15 @@ const resolvers = {
       { authorId }: Track,
       _: Root,
       { dataSources }: any
-    ): Promise<Author> => {
+    ): Promise<AuthorSchema> => {
       return dataSources.trackAPI.getAuthor(authorId);
+    },
+    modules: async (
+      { id }: Track,
+      _: Root,
+      { dataSources }: any
+    ): Promise<ModuleSchema[]> => {
+      return dataSources.trackAPI.getTrackModules(id);
     },
   },
 };

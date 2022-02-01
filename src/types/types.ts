@@ -18,12 +18,12 @@ export interface Module {
 export interface Track {
   id: string;
   title: string;
-  thumbnail: String;
+  thumbnail: string;
   length: number;
   modulesCount: number;
   description: String;
   numberOfViews: number;
-  modules: Module[];
+  modules: string[];
   authorId: string;
   topic: string;
   createAt: string;
