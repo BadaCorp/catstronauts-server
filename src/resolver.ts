@@ -6,6 +6,13 @@ interface TrackSchema
   modules: Module[];
 }
 
+interface TrackSchemaOnUpdate {
+  code: number;
+  success: boolean;
+  message: string;
+  track: TrackSchema | null;
+}
+
 interface AuthorSchema extends Author {}
 
 interface ModuleSchema
@@ -23,7 +30,7 @@ const resolvers = {
       __: Root,
       { dataSources }: any
     ): Promise<TrackSchema[]> => {
-      return dataSources.trackAPI.getTracksForHome();
+      return await dataSources.trackAPI.getTracksForHome();
     },
     // get a single track by id, for the Track page
     track: async (
@@ -31,23 +38,48 @@ const resolvers = {
       { id }: Track,
       { dataSources }: any
     ): Promise<TrackSchema> => {
-      return dataSources.trackAPI.getTrack(id);
+      return await dataSources.trackAPI.getTrack(id);
     },
   },
+  Mutation: {
+    incrementTrackViews: async (
+      _: Root,
+      { id }: Track,
+      { dataSources }: any
+    ): Promise<TrackSchemaOnUpdate> => {
+      try {
+        const track = await dataSources.trackAPI.incrementTrackViews(id);
+        return {
+          code: 200,
+          success: true,
+          message: `Successfully incremented number of views for track ${id}`,
+          track,
+        };
+      } catch (err: any) {
+        return {
+          code: err.extensions.response.status,
+          success: false,
+          message: `${err.extensions.response.body.slice(0, -1)} - (${id}).`,
+          track: null,
+        };
+      }
+    },
+  },
+
   Track: {
     author: async (
       { authorId }: Track,
       _: Root,
       { dataSources }: any
     ): Promise<AuthorSchema> => {
-      return dataSources.trackAPI.getAuthor(authorId);
+      return await dataSources.trackAPI.getAuthor(authorId);
     },
     modules: async (
       { id }: Track,
       _: Root,
       { dataSources }: any
     ): Promise<ModuleSchema[]> => {
-      return dataSources.trackAPI.getTrackModules(id);
+      return await dataSources.trackAPI.getTrackModules(id);
     },
   },
 };
