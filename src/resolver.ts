@@ -81,6 +81,15 @@ const resolvers = {
     ): Promise<ModuleSchema[]> => {
       return await dataSources.trackAPI.getTrackModules(id);
     },
+    durationInSeconds: async ({ length }: Track): Promise<Track["length"]> => {
+      return length;
+    },
+  },
+
+  Module: {
+    durationInSeconds: async ({ length }: Track): Promise<Module["length"]> => {
+      return length;
+    },
   },
 };
 
